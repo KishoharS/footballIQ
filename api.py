@@ -29,6 +29,7 @@ llm = ChatGroq(
 
 @tool(response_format="content_and_artifact")
 def retrieve_context(query: str):
+    """Retrieve information to help answer a query about EA FC player ratings."""
     retrieved_docs = vectorstore.similarity_search(query, k=2)
     serialized = "\n\n".join(
         f"Source: {doc.metadata}\nContent: {doc.page_content}"

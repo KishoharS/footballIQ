@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FootballIQ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --black: #000000;
+      --white: #ffffff;
+      --gray-100: #f5f5f7;
+      --gray-200: #e8e8ed;
+      --gray-400: #a1a1a6;
+      --gray-600: #6e6e73;
+      --gray-800: #1d1d1f;
+      --accent: #0071e3;
+      --accent-soft: #e8f1fb;
+      --mono: 'DM Mono', monospace;
+      --serif: 'Playfair Display', Georgia, serif;
+      --sans: 'DM Sans', -apple-system, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--sans);
+      background: var(--white);
+      color: var(--gray-800);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 48px;
+      height: 52px;
+      background: rgba(255,255,255,0.82);
+      backdrop-filter: saturate(180%) blur(20px);
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+    }
+
+    .nav-logo {
+      font-family: var(--serif);
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+      color: var(--gray-800);
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--gray-600);
+      text-decoration: none;
+      letter-spacing: 0.1px;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--gray-800); }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px 24px 80px;
+      background: var(--white);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      width: 700px; height: 700px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,113,227,0.06) 0%, transparent 70%);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    .hero-eyebrow {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 24px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.2s;
+    }
+
+    .hero-title {
+      font-family: var(--serif);
+      font-size: clamp(52px, 8vw, 96px);
+      font-weight: 600;
+      line-height: 1.0;
+      letter-spacing: -2px;
+      color: var(--black);
+      margin-bottom: 12px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.4s;
+    }
+
+    .hero-title em {
+      font-style: italic;
+      font-weight: 400;
+      color: var(--gray-600);
+    }
+
+    .hero-subtitle {
+      font-size: 19px;
+      font-weight: 300;
+      color: var(--gray-600);
+      line-height: 1.6;
+      max-width: 520px;
+      margin: 28px auto 0;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.6s;
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 16px;
+      margin-top: 48px;
+      justify-content: center;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.8s;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 980px;
+      font-size: 14px;
+      font-weight: 500;
+      font-family: var(--sans);
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s;
+      display: inline-block;
+    }
+
+    .btn-primary:hover { background: #0077ed; transform: scale(1.02); }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--accent);
+      border: 1.5px solid var(--gray-200);
+      padding: 14px 28px;
+      border-radius: 980px;
+      font-size: 14px;
+      font-weight: 500;
+      font-family: var(--sans);
+      cursor: pointer;
+      text-decoration: none;
+      transition: border-color 0.2s, transform 0.15s;
+      display: inline-block;
+    }
+
+    .btn-ghost:hover { border-color: var(--accent); transform: scale(1.02); }
+
+    .hero-scroll-hint {
+      position: absolute;
+      bottom: 36px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 1.2s;
+    }
+
+    .scroll-line {
+      width: 1px;
+      height: 40px;
+      background: linear-gradient(to bottom, var(--gray-400), transparent);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+
+    .scroll-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gray-400);
+    }
+
+    /* DEMO SECTION */
+    .demo-section {
+      background: var(--gray-100);
+      padding: 120px 24px;
+    }
+
+    .section-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--accent);
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-family: var(--serif);
+      font-size: clamp(32px, 5vw, 52px);
+      font-weight: 600;
+      letter-spacing: -1px;
+      text-align: center;
+      color: var(--black);
+      line-height: 1.1;
+      margin-bottom: 16px;
+    }
+
+    .section-body {
+      font-size: 17px;
+      font-weight: 300;
+      color: var(--gray-600);
+      text-align: center;
+      max-width: 480px;
+      margin: 0 auto 64px;
+      line-height: 1.7;
+    }
+
+    /* CHAT DEMO */
+    .chat-wrapper {
+      max-width: 680px;
+      margin: 0 auto;
+      background: var(--white);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 2px 40px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04);
+    }
+
+    .chat-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--gray-200);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .chat-dot {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+    }
+
+    .chat-dot:nth-child(1) { background: #ff5f57; }
+    .chat-dot:nth-child(2) { background: #febc2e; }
+    .chat-dot:nth-child(3) { background: #28c840; }
+
+    .chat-title {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--gray-400);
+      margin-left: 8px;
+    }
+
+    .chat-status {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: #28c840;
+    }
+
+    .status-dot {
+      width: 6px; height: 6px;
+      background: #28c840;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    .chat-messages {
+      padding: 28px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      min-height: 320px;
+    }
+
+    .msg {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .msg.visible { opacity: 1; transform: translateY(0); }
+
+    .msg-avatar {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .msg.user .msg-avatar {
+      background: var(--gray-800);
+      color: white;
+      font-weight: 500;
+    }
+
+    .msg.bot .msg-avatar {
+      background: var(--accent);
+      color: white;
+    }
+
+    .msg-bubble {
+      background: var(--gray-100);
+      border-radius: 14px;
+      padding: 12px 16px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--gray-800);
+      max-width: 520px;
+    }
+
+    .msg.user .msg-bubble {
+      background: var(--gray-800);
+      color: white;
+      margin-left: auto;
+    }
+
+    .msg.user { flex-direction: row-reverse; }
+
+    .msg-bubble strong { font-weight: 600; }
+
+    .stat-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+
+    .stat-chip {
+      background: var(--accent-soft);
+      color: var(--accent);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 400;
+    }
+
+    .chat-input-area {
+      padding: 16px 20px;
+      border-top: 1px solid var(--gray-200);
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .chat-input {
+      flex: 1;
+      background: var(--gray-100);
+      border: none;
+      border-radius: 980px;
+      padding: 10px 18px;
+      font-size: 14px;
+      font-family: var(--sans);
+      color: var(--gray-800);
+      outline: none;
+    }
+
+    .chat-input::placeholder { color: var(--gray-400); }
+
+    .chat-send {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: var(--accent);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+      flex-shrink: 0;
+    }
+
+    .chat-send:hover { background: #0077ed; }
+
+    .chat-send svg { width: 16px; height: 16px; fill: white; }
+
+    /* PIPELINE */
+    .pipeline-section {
+      padding: 120px 24px;
+      background: var(--white);
+    }
+
+    .pipeline-grid {
+      max-width: 960px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 2px;
+      background: var(--gray-200);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    .pipeline-card {
+      background: var(--white);
+      padding: 40px 36px;
+      transition: background 0.2s;
+    }
+
+    .pipeline-card:hover { background: var(--gray-100); }
+
+    .pipeline-num {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+
+    .pipeline-icon {
+      font-size: 28px;
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .pipeline-name {
+      font-family: var(--serif);
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--black);
+      margin-bottom: 10px;
+      letter-spacing: -0.3px;
+    }
+
+    .pipeline-desc {
+      font-size: 14px;
+      font-weight: 300;
+      color: var(--gray-600);
+      line-height: 1.7;
+    }
+
+    .pipeline-tag {
+      display: inline-block;
+      margin-top: 16px;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--gray-400);
+      background: var(--gray-100);
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+
+    /* STACK */
+    .stack-section {
+      background: var(--gray-800);
+      padding: 100px 24px;
+    }
+
+    .stack-section .section-title { color: var(--white); }
+    .stack-section .section-label { color: #5ac8fa; }
+    .stack-section .section-body { color: var(--gray-400); }
+
+    .stack-grid {
+      max-width: 800px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .stack-item {
+      background: var(--gray-800);
+      padding: 32px 28px;
+      border: none;
+      transition: background 0.2s;
+    }
+
+    .stack-item:hover { background: #2d2d2f; }
+
+    .stack-item-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gray-400);
+      margin-bottom: 8px;
+    }
+
+    .stack-item-name {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--white);
+      letter-spacing: -0.2px;
+    }
+
+    /* API SECTION */
+    .api-section {
+      padding: 120px 24px;
+      background: var(--white);
+    }
+
+    .api-wrapper {
+      max-width: 800px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+      background: var(--gray-200);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    .api-card {
+      background: var(--white);
+      padding: 40px 36px;
+    }
+
+    .api-method {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 1px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      display: inline-block;
+      margin-bottom: 16px;
+    }
+
+    .method-post { background: #e3f3e8; color: #1a7a3a; }
+    .method-get { background: var(--accent-soft); color: var(--accent); }
+
+    .api-endpoint {
+      font-family: var(--mono);
+      font-size: 22px;
+      font-weight: 400;
+      color: var(--black);
+      margin-bottom: 12px;
+      letter-spacing: -0.5px;
+    }
+
+    .api-desc {
+      font-size: 14px;
+      color: var(--gray-600);
+      line-height: 1.7;
+      font-weight: 300;
+    }
+
+    .code-block {
+      background: var(--gray-800);
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 20px;
+      font-family: var(--mono);
+      font-size: 12px;
+      line-height: 1.8;
+      color: #c9d1d9;
+      overflow-x: auto;
+    }
+
+    .code-key { color: #79c0ff; }
+    .code-string { color: #a5d6ff; }
+    .code-comment { color: #6e7681; }
+
+    /* ABOUT */
+    .about-section {
+      background: var(--gray-100);
+      padding: 120px 24px;
+    }
+
+    .about-inner {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .about-name {
+      font-family: var(--serif);
+      font-size: clamp(36px, 5vw, 56px);
+      font-weight: 600;
+      letter-spacing: -1.5px;
+      color: var(--black);
+      margin-bottom: 8px;
+      line-height: 1.1;
+    }
+
+    .about-name em {
+      font-style: italic;
+      font-weight: 400;
+      color: var(--gray-600);
+    }
+
+    .about-role {
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 36px;
+    }
+
+    .about-bio {
+      font-size: 18px;
+      font-weight: 300;
+      color: var(--gray-600);
+      line-height: 1.8;
+      margin-bottom: 48px;
+    }
+
+    .about-bio strong {
+      color: var(--gray-800);
+      font-weight: 500;
+    }
+
+    .about-links {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .about-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 22px;
+      border-radius: 980px;
+      font-size: 13px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: transform 0.15s, background 0.2s;
+      border: 1.5px solid var(--gray-200);
+      color: var(--gray-800);
+      background: var(--white);
+    }
+
+    .about-link:hover {
+      transform: scale(1.03);
+      border-color: var(--gray-400);
+    }
+
+    .about-divider {
+      width: 48px;
+      height: 2px;
+      background: var(--accent);
+      margin: 40px 0;
+      border-radius: 2px;
+    }
+
+    .about-meta {
+      display: flex;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+
+    .meta-item { }
+
+    .meta-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gray-400);
+      margin-bottom: 4px;
+    }
+
+    .meta-value {
+      font-size: 15px;
+      font-weight: 400;
+      color: var(--gray-800);
+    }
+
+    /* FOOTER */
+    footer {
+      padding: 40px 48px;
+      border-top: 1px solid var(--gray-200);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--white);
+    }
+
+    .footer-copy {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--gray-400);
+      letter-spacing: 0.5px;
+    }
+
+    .footer-logo {
+      font-family: var(--serif);
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--gray-800);
+    }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.4; }
+    }
+
+    @keyframes scrollPulse {
+      0%, 100% { transform: scaleY(1); opacity: 1; }
+      50%       { transform: scaleY(0.6); opacity: 0.4; }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 640px) {
+      nav { padding: 0 20px; }
+      .nav-links { display: none; }
+      .api-wrapper { grid-template-columns: 1fr; }
+      footer { flex-direction: column; gap: 12px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#" class="nav-logo">FootballIQ</a>
+    <ul class="nav-links">
+      <li><a href="#demo">Demo</a></li>
+      <li><a href="#pipeline">Pipeline</a></li>
+      <li><a href="#stack">Stack</a></li>
+      <li><a href="#api">API</a></li>
+      <li><a href="#about">About</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <p class="hero-eyebrow">EA FC 26 · RAG · LangChain · ChromaDB</p>
+    <h1 class="hero-title">Football data,<br><em>intelligently queried.</em></h1>
+    <p class="hero-subtitle">Ask anything about EA FC player ratings and stats. Powered by a retrieval-augmented generation pipeline over 16,000+ player profiles.</p>
+    <div class="hero-cta">
+      <a href="#demo" class="btn-primary">See it in action</a>
+      <a href="https://github.com/KishoharS/footballiq" class="btn-ghost" target="_blank">View on GitHub</a>
+    </div>
+    <div class="hero-scroll-hint">
+      <span class="scroll-label">scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- DEMO -->
+  <section class="demo-section" id="demo">
+    <p class="section-label reveal">Live Demo</p>
+    <h2 class="section-title reveal">Ask about any player.</h2>
+    <p class="section-body reveal">The system retrieves relevant data from ChromaDB before generating an answer — not hallucination, grounded retrieval.</p>
+
+    <div class="chat-wrapper reveal">
+      <div class="chat-header">
+        <div class="chat-dot"></div>
+        <div class="chat-dot"></div>
+        <div class="chat-dot"></div>
+        <span class="chat-title">footballiq · POST /ask</span>
+        <div class="chat-status">
+          <div class="status-dot"></div>
+          live
+        </div>
+      </div>
+
+      <div class="chat-messages" id="chatMessages">
+        <div class="msg user" id="msg1">
+          <div class="msg-avatar">K</div>
+          <div class="msg-bubble">What is Salah's pace and dribbling in EA FC 26?</div>
+        </div>
+        <div class="msg bot" id="msg2">
+          <div class="msg-avatar">⚽</div>
+          <div class="msg-bubble">
+            <strong>Mohamed Salah</strong> — Liverpool, Right Winger
+            <div class="stat-row">
+              <span class="stat-chip">PAC · 89</span>
+              <span class="stat-chip">DRI · 87</span>
+              <span class="stat-chip">OVR · 91</span>
+            </div>
+          </div>
+        </div>
+        <div class="msg user" id="msg3">
+          <div class="msg-avatar">K</div>
+          <div class="msg-bubble">Compare Rodri's defending with Casemiro.</div>
+        </div>
+        <div class="msg bot" id="msg4">
+          <div class="msg-avatar">⚽</div>
+          <div class="msg-bubble">
+            <strong>Rodri</strong> DEF · 85 &nbsp;·&nbsp; <strong>Casemiro</strong> DEF · 83<br>
+            <span style="font-size:13px; color: var(--gray-400); margin-top:6px; display:block;">Retrieved from ChromaDB · 2 matching chunks</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="chat-input-area">
+        <input class="chat-input" type="text" placeholder="Ask about any EA FC player…" id="demoInput" />
+        <button class="chat-send" onclick="handleDemo()">
+          <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PIPELINE -->
+  <section class="pipeline-section" id="pipeline">
+    <p class="section-label reveal">How it works</p>
+    <h2 class="section-title reveal">The RAG pipeline.</h2>
+    <p class="section-body reveal">Five stages, from raw CSV to grounded natural language answers.</p>
+
+    <div class="pipeline-grid reveal">
+      <div class="pipeline-card">
+        <p class="pipeline-num">01</p>
+        <span class="pipeline-icon">📄</span>
+        <h3 class="pipeline-name">Ingest</h3>
+        <p class="pipeline-desc">EA FC 26 player CSVs loaded with LangChain's CSVLoader. 16,254 player profiles and goalkeeper records parsed into Document objects.</p>
+        <span class="pipeline-tag">CSVLoader</span>
+      </div>
+      <div class="pipeline-card">
+        <p class="pipeline-num">02</p>
+        <span class="pipeline-icon">✂️</span>
+        <h3 class="pipeline-name">Chunk</h3>
+        <p class="pipeline-desc">RecursiveCharacterTextSplitter breaks documents into 1000-character chunks with 100-character overlap to preserve context at boundaries.</p>
+        <span class="pipeline-tag">chunk_size=1000</span>
+      </div>
+      <div class="pipeline-card">
+        <p class="pipeline-num">03</p>
+        <span class="pipeline-icon">🔢</span>
+        <h3 class="pipeline-name">Embed</h3>
+        <p class="pipeline-desc">all-MiniLM-L6-v2 from sentence-transformers encodes each chunk into a 384-dimensional vector capturing semantic meaning.</p>
+        <span class="pipeline-tag">384-dim vectors</span>
+      </div>
+      <div class="pipeline-card">
+        <p class="pipeline-num">04</p>
+        <span class="pipeline-icon">🗄️</span>
+        <h3 class="pipeline-name">Store</h3>
+        <p class="pipeline-desc">All vectors persisted in ChromaDB's local vector store. PersistentClient ensures data survives kernel restarts without re-embedding.</p>
+        <span class="pipeline-tag">PersistentClient</span>
+      </div>
+      <div class="pipeline-card">
+        <p class="pipeline-num">05</p>
+        <span class="pipeline-icon">🤖</span>
+        <h3 class="pipeline-name">Generate</h3>
+        <p class="pipeline-desc">A LangGraph ReAct agent autonomously decides when to query the vector store, retrieves top-k chunks, and grounds the LLM's answer in real data.</p>
+        <span class="pipeline-tag">ReAct · Groq</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- STACK -->
+  <section class="stack-section" id="stack">
+    <p class="section-label reveal">Technology</p>
+    <h2 class="section-title reveal">Built on a focused stack.</h2>
+    <p class="section-body reveal">No unnecessary dependencies. Every tool earns its place.</p>
+
+    <div class="stack-grid reveal">
+      <div class="stack-item">
+        <p class="stack-item-label">Orchestration</p>
+        <p class="stack-item-name">LangChain</p>
+      </div>
+      <div class="stack-item">
+        <p class="stack-item-label">Agent</p>
+        <p class="stack-item-name">LangGraph</p>
+      </div>
+      <div class="stack-item">
+        <p class="stack-item-label">Vector DB</p>
+        <p class="stack-item-name">ChromaDB</p>
+      </div>
+      <div class="stack-item">
+        <p class="stack-item-label">Embeddings</p>
+        <p class="stack-item-name">MiniLM-L6-v2</p>
+      </div>
+      <div class="stack-item">
+        <p class="stack-item-label">LLM</p>
+        <p class="stack-item-name">Groq · Qwen</p>
+      </div>
+      <div class="stack-item">
+        <p class="stack-item-label">Backend</p>
+        <p class="stack-item-name">FastAPI</p>
+      </div>
+      <div class="stack-item">
+        <p class="stack-item-label">Runtime</p>
+        <p class="stack-item-name">Python 3.13</p>
+      </div>
+      <div class="stack-item">
+        <p class="stack-item-label">Data</p>
+        <p class="stack-item-name">pandas</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- API -->
+  <section class="api-section" id="api">
+    <p class="section-label reveal">Endpoints</p>
+    <h2 class="section-title reveal">Simple. Restful. Ready.</h2>
+    <p class="section-body reveal">Two endpoints. One for answers, one for health checks.</p>
+
+    <div class="api-wrapper reveal">
+      <div class="api-card">
+        <span class="api-method method-post">POST</span>
+        <p class="api-endpoint">/ask</p>
+        <p class="api-desc">Send a natural language question, receive a grounded answer retrieved from the EA FC vector store.</p>
+        <div class="code-block">
+<span class="code-comment"># Request</span>
+{
+  <span class="code-key">"query"</span>: <span class="code-string">"What is Salah's pace?"</span>
+}
+
+<span class="code-comment"># Response</span>
+{
+  <span class="code-key">"response"</span>: <span class="code-string">"Salah's PAC is 89..."</span>
+}
+        </div>
+      </div>
+      <div class="api-card">
+        <span class="api-method method-get">GET</span>
+        <p class="api-endpoint">/health</p>
+        <p class="api-desc">Verify the service is running. Returns a simple status object for uptime monitoring and deployment checks.</p>
+        <div class="code-block">
+<span class="code-comment"># Response</span>
+{
+  <span class="code-key">"status"</span>: <span class="code-string">"ok"</span>
+}
+
+
+
+<span class="code-comment"># Run locally</span>
+uvicorn api:app --reload
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="about-section" id="about">
+    <div class="about-inner">
+      <p class="about-role reveal">Builder · AI & Data Science</p>
+      <h2 class="about-name reveal">Kishohar S.<br><em>Final year, B.Tech.</em></h2>
+
+      <div class="about-divider reveal"></div>
+
+      <p class="about-bio reveal">
+        Final-year <strong>AI and Data Science</strong> student graduating May 2026, based in Tiruchirappalli and relocating to Bengaluru. I build ML systems that actually work — not just notebooks. FootballIQ is one piece of that. I'm interested in <strong>agentic AI, retrieval systems,</strong> and production-grade ML pipelines at Series A/B startups.
+      </p>
+
+      <div class="about-meta reveal">
+        <div class="meta-item">
+          <p class="meta-label">Location</p>
+          <p class="meta-value">Tiruchirappalli → Bengaluru</p>
+        </div>
+        <div class="meta-item">
+          <p class="meta-label">Graduating</p>
+          <p class="meta-value">May 2026</p>
+        </div>
+        <div class="meta-item">
+          <p class="meta-label">Open to</p>
+          <p class="meta-value">ML Engineer · Data Scientist</p>
+        </div>
+      </div>
+
+      <div class="about-links reveal" style="margin-top: 40px;">
+        <a href="https://github.com/KishoharS" class="about-link" target="_blank">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+          GitHub
+        </a>
+        <a href="mailto:kishohar@example.com" class="about-link">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Email
+        </a>
+        <a href="https://linkedin.com/in/kishohar" class="about-link" target="_blank">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
+          LinkedIn
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p class="footer-copy">© 2026 Kishohar S. · Built from scratch.</p>
+    <p class="footer-logo">FootballIQ</p>
+  </footer>
+
+  <script>
+    // Scroll reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => entry.target.classList.add('visible'), i * 80);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    reveals.forEach(el => observer.observe(el));
+
+    // Stagger chat messages on scroll into view
+    const chatObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          ['msg1','msg2','msg3','msg4'].forEach((id, i) => {
+            setTimeout(() => {
+              const el = document.getElementById(id);
+              if (el) el.classList.add('visible');
+            }, i * 400);
+          });
+          chatObserver.disconnect();
+        }
+      });
+    }, { threshold: 0.3 });
+    const chatEl = document.getElementById('chatMessages');
+    if (chatEl) chatObserver.observe(chatEl);
+
+    // Demo input — purely visual
+    function handleDemo() {
+      const input = document.getElementById('demoInput');
+      const val = input.value.trim();
+      if (!val) return;
+      const msgs = document.getElementById('chatMessages');
+      const userMsg = document.createElement('div');
+      userMsg.className = 'msg user';
+      userMsg.innerHTML = `<div class="msg-avatar">K</div><div class="msg-bubble">${val}</div>`;
+      msgs.appendChild(userMsg);
+      setTimeout(() => userMsg.classList.add('visible'), 50);
+      input.value = '';
+      setTimeout(() => {
+        const botMsg = document.createElement('div');
+        botMsg.className = 'msg bot';
+        botMsg.innerHTML = `<div class="msg-avatar">⚽</div><div class="msg-bubble">Querying ChromaDB… <span style="color:var(--gray-400); font-size:13px;">connect to <code>POST /ask</code> to get a live response.</span></div>`;
+        msgs.appendChild(botMsg);
+        setTimeout(() => botMsg.classList.add('visible'), 50);
+        msgs.scrollTop = msgs.scrollHeight;
+      }, 800);
+    }
+
+    document.getElementById('demoInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') handleDemo();
+    });
+  </script>
+</body>
+</html>
