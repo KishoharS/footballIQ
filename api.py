@@ -46,7 +46,6 @@ system_message = SystemMessage(content=(
 
 agent = create_react_agent(llm, [retrieve_context], prompt=system_message)
 
-
 class QueryRequest(BaseModel):
     query: str
 
