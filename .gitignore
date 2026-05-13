@@ -68,4 +68,4 @@ htmlcov/
 # Build artifacts
 .mypy_cache/
 .ruff_cache/
-*.egg-info/
+*.egg-info/data/
