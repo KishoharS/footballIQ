@@ -1058,8 +1058,8 @@ uvicorn api:app --reload
     const chatEl = document.getElementById('chatMessages');
     if (chatEl) chatObserver.observe(chatEl);
 
-    // Demo input — purely visual
-    function handleDemo() {
+    // Demo input with live API calls
+    async function handleDemo() {
       const input = document.getElementById('demoInput');
       const val = input.value.trim();
       if (!val) return;
@@ -1070,14 +1070,31 @@ uvicorn api:app --reload
       msgs.appendChild(userMsg);
       setTimeout(() => userMsg.classList.add('visible'), 50);
       input.value = '';
-      setTimeout(() => {
-        const botMsg = document.createElement('div');
-        botMsg.className = 'msg bot';
-        botMsg.innerHTML = `<div class="msg-avatar">⚽</div><div class="msg-bubble">Querying ChromaDB… <span style="color:var(--gray-400); font-size:13px;">connect to <code>POST /ask</code> to get a live response.</span></div>`;
-        msgs.appendChild(botMsg);
-        setTimeout(() => botMsg.classList.add('visible'), 50);
-        msgs.scrollTop = msgs.scrollHeight;
-      }, 800);
+      
+      const botMsg = document.createElement('div');
+      botMsg.className = 'msg bot';
+      botMsg.innerHTML = `<div class="msg-avatar">⚽</div><div class="msg-bubble">Querying ChromaDB…</div>`;
+      msgs.appendChild(botMsg);
+      setTimeout(() => botMsg.classList.add('visible'), 50);
+      msgs.scrollTop = msgs.scrollHeight;
+      
+      try {
+        const response = await fetch('http://localhost:8000/ask', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: val })
+        });
+        
+        if (!response.ok) {
+          throw new Error(`API error: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        botMsg.innerHTML = `<div class="msg-avatar">⚽</div><div class="msg-bubble">${data.response}</div>`;
+      } catch (error) {
+        botMsg.innerHTML = `<div class="msg-avatar">⚽</div><div class="msg-bubble" style="color:var(--gray-400);">Error: ${error.message}. Make sure the API is running at http://localhost:8000</div>`;
+      }
+      msgs.scrollTop = msgs.scrollHeight;
     }
 
     document.getElementById('demoInput').addEventListener('keydown', e => {
