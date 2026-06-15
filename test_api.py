@@ -9,7 +9,6 @@ from unittest.mock import patch, MagicMock
 import os
 import sys
 
-# Mock environment setup
 os.environ["GROQ_API_KEY"] = "test-key"
 
 from api import app, QueryRequest
@@ -63,12 +62,11 @@ class TestAskEndpoint:
     def test_ask_with_empty_query_fails(self):
         """Empty query should be rejected"""
         response = client.post("/ask", json={"query": ""})
-        assert response.status_code == 422  # Validation error
+        assert response.status_code == 422 
     
     def test_ask_with_valid_query_structure(self):
         """Valid query format should be accepted"""
         request_data = {"query": "What is Salah's pace?"}
-        # Just checking the request model validation
         query = QueryRequest(**request_data)
         assert query.query == "What is Salah's pace?"
     
@@ -91,7 +89,6 @@ class TestErrorHandling:
         """Error responses should have consistent structure"""
         response = client.post("/ask", json={})
         assert response.status_code == 422
-        # FastAPI returns detailed validation errors
 
 
 class TestCORSHeaders:
@@ -100,7 +97,6 @@ class TestCORSHeaders:
     def test_cors_headers_present(self):
         """CORS headers should be in response"""
         response = client.get("/health")
-        # Check that access-control headers exist (if CORS is configured)
         assert response.status_code == 200
 
 
@@ -113,7 +109,6 @@ class TestInputValidation:
         valid_request = QueryRequest(query="test query")
         assert valid_request.query == "test query"
         
-        # Empty should fail
         with pytest.raises(ValueError):
             QueryRequest(query="")
     
@@ -121,8 +116,7 @@ class TestInputValidation:
         """Special characters should be handled safely"""
         request_data = {"query": "What's the player's pace? <script>alert()</script>"}
         response = client.post("/ask", json=request_data)
-        # Should accept but not execute malicious code
-        assert response.status_code in [200, 503]  # May not be ready in test
+        assert response.status_code in [200, 503]
 
 
 class TestResponseFormat:
@@ -139,12 +133,7 @@ class TestResponseFormat:
         """Error responses should be consistent"""
         response = client.post("/ask", json={})
         assert response.status_code == 422
-        # FastAPI automatically provides error details
 
-
-# ============================================================================
-# Integration Tests (require app to be running)
-# ============================================================================
 
 @pytest.mark.integration
 class TestIntegration:
@@ -152,16 +141,11 @@ class TestIntegration:
     
     def test_full_ask_flow(self):
         """Test complete ask flow (requires app initialization)"""
-        # This test would require the app to be fully initialized
-        # with a valid LLM and vectorstore, which is not available
-        # in a unit test environment
         pass
     
     def test_concurrent_requests(self):
         """Test handling of concurrent requests"""
-        # Would need async testing framework
         pass
-
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

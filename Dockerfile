@@ -44,10 +44,8 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
 
 # Run application with gunicorn for production
 CMD ["gunicorn", \
-     "--workers=4", \
+     "--workers=1", \
      "--worker-class=uvicorn.workers.UvicornWorker", \
      "--bind=0.0.0.0:8000", \
      "--timeout=120", \
-     "--access-logfile=-", \
-     "--error-logfile=-", \
      "api:app"]
