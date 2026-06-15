@@ -72,3 +72,5 @@ htmlcov/
 
 
 pracice.ipynb
+.DS_Store
+__pycache__/
