@@ -15,7 +15,6 @@ langgraph
 
 # Vector Database & Embeddings
 chromadb
-sentence-transformers
 
 # LLM Provider
 groq
