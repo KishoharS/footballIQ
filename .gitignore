@@ -31,6 +31,7 @@ venv/
 ENV/
 env/
 .venv
+test_env/
 
 # IDE
 .vscode/
