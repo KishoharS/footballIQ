@@ -9,16 +9,14 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ['3.11', '3.12', '3.13']
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python ${{ matrix.python-version }}
+      # Locked strictly to 3.11 to mirror the Dockerfile and prevent false positives
+      - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: '3.11'
           cache: 'pip'
 
       - name: Install dependencies
@@ -43,6 +41,11 @@ jobs:
           pip install bandit
           bandit -r api.py -ll
         continue-on-error: true
+
+      # ADDED: Actually run your tests!
+      - name: Run unit tests
+        run: pytest
+        continue-on-error: false # If tests fail, the pipeline should fail
 
   build:
     needs: test
@@ -74,3 +77,12 @@ jobs:
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: 'trivy-results.sarif'
+          
+      # OPTIONAL ARCHITECTURE UPGRADE: 
+      # If you want Render to ONLY deploy if this Trivy scan passes, 
+      # turn off "Auto-Deploy" in Render, copy your Deploy Hook URL, 
+      # add it to GitHub Secrets as RENDER_DEPLOY_HOOK, and uncomment the step below:
+      
+      # - name: Trigger Render Deployment
+      #   if: success()
+      #   run: curl ${{ secrets.RENDER_DEPLOY_HOOK }}
