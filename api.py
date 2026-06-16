@@ -15,9 +15,9 @@ from groq import APITimeoutError
 from langchain.tools import tool
 from langchain_chroma import Chroma
 from langchain_community.document_loaders.csv_loader import CSVLoader
-from langchain_core.messages import SystemMessage, HumanMessage  # Added HumanMessage
+from langchain_core.messages import SystemMessage, HumanMessage
 from langchain_groq import ChatGroq
-from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEndpointEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langgraph.prebuilt import create_react_agent
 from pydantic import BaseModel, Field
@@ -33,7 +33,6 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 CHROMA_DB_PATH = os.getenv("CHROMA_DB_PATH", "./chroma_db")
-EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "all-MiniLM-L6-v2")
 LLM_MODEL = os.getenv("LLM_MODEL", "llama-3.3-70b-versatile")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 COLLECTION_NAME = "soccer"
@@ -49,6 +48,17 @@ ALLOWED_ORIGINS = [
 
 if not GROQ_API_KEY:
     raise ValueError("GROQ_API_KEY environment variable is required")
+
+GROQ_HF_TOKEN = os.getenv("HUGGINGFACEHUB_API_TOKEN")
+if not GROQ_HF_TOKEN:
+    raise ValueError("HUGGINGFACEHUB_API_TOKEN environment variable is required")
+
+# Global external embedding engine - Outsourced to Hugging Face infrastructure
+embedder = HuggingFaceEndpointEmbeddings(
+    model="sentence-transformers/all-MiniLM-L6-v2",
+    task="feature-extraction",
+    huggingfacehub_api_token=GROQ_HF_TOKEN
+)
 
 # GLOBAL STATE
 _app_state = {
@@ -66,9 +76,6 @@ async def lifespan(app: FastAPI):
 
         logger.info(f"Connecting to ChromaDB at {CHROMA_DB_PATH}...")
         chroma_client = chromadb.PersistentClient(path=CHROMA_DB_PATH)
-
-        logger.info(f"Loading embedding model: {EMBEDDING_MODEL}...")
-        embedder = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL)
 
         existing_collections = [c.name for c in chroma_client.list_collections()]
 
@@ -102,9 +109,8 @@ async def lifespan(app: FastAPI):
 
             collection = chroma_client.create_collection(COLLECTION_NAME)
 
-            # FIX: Convert numpy output format directly to vanilla python lists
-            raw_embeddings = embedder.client.encode(sentences)
-            embeddings = raw_embeddings.tolist()
+            logger.info("Generating embeddings via Hugging Face Inference API...")
+            embeddings = embedder.embed_documents(sentences)
 
             batches = create_batches(
                 api=chroma_client,
@@ -261,7 +267,6 @@ async def ask(request: QueryRequest):
         logger.info(f"Processing query: {request.query[:100]}...")
 
         try:
-            # FIX: Wrap dictionary message using actual HumanMessage objects
             result = _app_state["agent"].invoke(
                 {"messages": [HumanMessage(content=request.query)]}
             )
