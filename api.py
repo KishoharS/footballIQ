@@ -109,22 +109,33 @@ async def lifespan(app: FastAPI):
 
             collection = chroma_client.create_collection(COLLECTION_NAME)
 
-            logger.info("Generating embeddings via Hugging Face Inference API...")
-            embeddings = embedder.embed_documents(sentences)
-
-            batches = create_batches(
-                api=chroma_client,
-                embeddings=embeddings,
-                ids=[str(i) for i in range(len(embeddings))],
-                documents=sentences,
-            )
-            for batch in batches:
-                ids_batch, embeddings_batch, _, documents_batch = batch
-                collection.add(
-                    ids=ids_batch,
-                    embeddings=embeddings_batch,
-                    documents=documents_batch,
-                )
+            logger.info(f"Generating embeddings for {len(sentences)} chunks via Hugging Face API in batches...")
+            
+            # Send sentences in small batches of 100 to avoid HF API timeouts
+            HF_BATCH_SIZE = 100
+            for i in range(0, len(sentences), HF_BATCH_SIZE):
+                batch_sentences = sentences[i : i + HF_BATCH_SIZE]
+                batch_ids = [str(j) for j in range(i, i + len(batch_sentences))]
+                
+                logger.info(f"Processing batch {i // HF_BATCH_SIZE + 1} / {(len(sentences) // HF_BATCH_SIZE) + 1}...")
+                
+                try:
+                    # Fetch embeddings for just this small batch
+                    batch_embeddings = embedder.embed_documents(batch_sentences)
+                    
+                    # Immediately store this batch into ChromaDB
+                    collection.add(
+                        ids=batch_ids,
+                        embeddings=batch_embeddings,
+                        documents=batch_sentences,
+                    )
+                except Exception as e:
+                    logger.error(f"Failed to embed batch {i // HF_BATCH_SIZE + 1}. Skipping. Error: {str(e)}")
+                    continue
+                
+                # Pause for 1 second to respect Hugging Face's free tier rate limits
+                time.sleep(1) 
+                
             logger.info("Ingestion completed smoothly.")
 
         _app_state["vectorstore"] = Chroma(
